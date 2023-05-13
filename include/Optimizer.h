@@ -46,16 +46,18 @@ class LoopClosing;
 class Optimizer
 {
 public:
-
+    // BA优化(关键帧组,地图点,迭代次数,pbStopFlag,nLoopKF,bRobust)
     void static BundleAdjustment(const std::vector<KeyFrame*> &vpKF, const std::vector<MapPoint*> &vpMP,
                                  int nIterations = 5, bool *pbStopFlag=NULL, const unsigned long nLoopKF=0,
                                  const bool bRobust = true);
+    // 全局BA优化(地图,迭代次数,pbStopFlag,nLoopKF,bRobust)
     void static GlobalBundleAdjustemnt(Map* pMap, int nIterations=5, bool *pbStopFlag=NULL,
                                        const unsigned long nLoopKF=0, const bool bRobust = true);
+    // 全内
     void static FullInertialBA(Map *pMap, int its, const bool bFixLocal=false, const unsigned long nLoopKF=0, bool *pbStopFlag=NULL, bool bInit=false, float priorG = 1e2, float priorA=1e6, Eigen::VectorXd *vSingVal = NULL, bool *bHess=NULL);
-
+    // 局部BA优化(关键帧,pbStopFlag,地图,固定关键帧数量,优化关键帧数量,地图点数量,边的数量)
     void static LocalBundleAdjustment(KeyFrame* pKF, bool *pbStopFlag, Map *pMap, int& num_fixedKF, int& num_OptKF, int& num_MPs, int& num_edges);
-
+    // 位姿优化(帧)
     int static PoseOptimization(Frame* pFrame);
     int static PoseInertialOptimizationLastKeyFrame(Frame* pFrame, bool bRecInit = false);
     int static PoseInertialOptimizationLastFrame(Frame *pFrame, bool bRecInit = false);
@@ -81,16 +83,19 @@ public:
                             g2o::Sim3 &g2oS12, const float th2, const bool bFixScale,
                             Eigen::Matrix<double,7,7> &mAcumHessian, const bool bAllPoints=false);
 
-    // For inertial systems
-
+    // For inertial systems 针对惯性系统
+    // 局部惯性BA优化(关键帧,pbStopFlag,地图)
     void static LocalInertialBA(KeyFrame* pKF, bool *pbStopFlag, Map *pMap, int& num_fixedKF, int& num_OptKF, int& num_MPs, int& num_edges, bool bLarge = false, bool bRecInit = false);
+    // 合并惯性BA优化(当前关键帧,合并关键帧,pbStopFlag,地图,corrPoses)
     void static MergeInertialBA(KeyFrame* pCurrKF, KeyFrame* pMergeKF, bool *pbStopFlag, Map *pMap, LoopClosing::KeyFrameAndPose &corrPoses);
 
     // Local BA in welding area when two maps are merged
+    // 局部BA优化(主关键帧,调整关键帧组,固定关键帧组,pbStopFlag)
     void static LocalBundleAdjustment(KeyFrame* pMainKF,vector<KeyFrame*> vpAdjustKF, vector<KeyFrame*> vpFixedKF, bool *pbStopFlag);
 
     // Marginalize block element (start:end,start:end). Perform Schur complement.
     // Marginalized elements are filled with zeros.
+    // 边缘化(海森矩阵H,起始位置,终止位置)
     static Eigen::MatrixXd Marginalize(const Eigen::MatrixXd &H, const int &start, const int &end);
 
     // Inertial pose-graph

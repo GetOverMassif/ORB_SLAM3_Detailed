@@ -51,6 +51,7 @@ bool sortByVal(const pair<MapPoint*, int> &a, const pair<MapPoint*, int> &b)
 
 void Optimizer::GlobalBundleAdjustemnt(Map* pMap, int nIterations, bool* pbStopFlag, const unsigned long nLoopKF, const bool bRobust)
 {
+    // 获取地图中的全部关键帧和地图点，使用它们进行BA优化
     vector<KeyFrame*> vpKFs = pMap->GetAllKeyFrames();
     vector<MapPoint*> vpMP = pMap->GetAllMapPoints();
     BundleAdjustment(vpKFs,vpMP,nIterations,pbStopFlag, nLoopKF, bRobust);
@@ -60,11 +61,12 @@ void Optimizer::GlobalBundleAdjustemnt(Map* pMap, int nIterations, bool* pbStopF
 void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<MapPoint *> &vpMP,
                                  int nIterations, bool* pbStopFlag, const unsigned long nLoopKF, const bool bRobust)
 {
+    // 统计地图点的包含情况
     vector<bool> vbNotIncludedMP;
     vbNotIncludedMP.resize(vpMP.size());
-
     Map* pMap = vpKFs[0]->GetMap();
 
+    // 创建g2o的稀疏优化器、求解3DSLAM问题的线性求解器(设置为位姿矩阵形式)，获取其指针
     g2o::SparseOptimizer optimizer;
     g2o::BlockSolver_6_3::LinearSolverType * linearSolver;
 
@@ -72,12 +74,15 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
 
     g2o::BlockSolver_6_3 * solver_ptr = new g2o::BlockSolver_6_3(linearSolver);
 
+    // 创建g2o的Levenberg算法求解器(线性求解器指针)，设置优化器的算法，setVerbose？
     g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
     optimizer.setAlgorithm(solver);
     optimizer.setVerbose(false);
 
+    // 是否设置强制停止
     if(pbStopFlag)
         optimizer.setForceStopFlag(pbStopFlag);
+
 
     long unsigned int maxKFid = 0;
 
@@ -111,8 +116,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
     vpMapPointEdgeStereo.reserve(nExpectedSize);
 
     
-    // Set KeyFrame vertices
-
+    // Set KeyFrame vertices 设置关键帧顶点
     for(size_t i=0; i<vpKFs.size(); i++)
     {
         KeyFrame* pKF = vpKFs[i];
@@ -124,14 +128,14 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
         vSE3->setId(pKF->mnId);
         vSE3->setFixed(pKF->mnId==pMap->GetInitKFid());
         optimizer.addVertex(vSE3);
-        if(pKF->mnId>maxKFid)
-            maxKFid=pKF->mnId;
+        if(pKF->mnId > maxKFid)
+            maxKFid = pKF->mnId;
     }
 
     const float thHuber2D = sqrt(5.99);
     const float thHuber3D = sqrt(7.815);
 
-    // Set MapPoint vertices
+    // Set MapPoint vertices 设置地图点顶点
     for(size_t i=0; i<vpMP.size(); i++)
     {
         MapPoint* pMP = vpMP[i];
@@ -139,7 +143,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
             continue;
         g2o::VertexSBAPointXYZ* vPoint = new g2o::VertexSBAPointXYZ();
         vPoint->setEstimate(pMP->GetWorldPos().cast<double>());
-        const int id = pMP->mnId+maxKFid+1;
+        const int id = pMP->mnId + maxKFid + 1;
         vPoint->setId(id);
         vPoint->setMarginalized(true);
         optimizer.addVertex(vPoint);
@@ -151,7 +155,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
         for(map<KeyFrame*,tuple<int,int>>::const_iterator mit=observations.begin(); mit!=observations.end(); mit++)
         {
             KeyFrame* pKF = mit->first;
-            if(pKF->isBad() || pKF->mnId>maxKFid)
+            if(pKF->isBad() || pKF->mnId > maxKFid)
                 continue;
             if(optimizer.vertex(id) == NULL || optimizer.vertex(pKF->mnId) == NULL)
                 continue;
@@ -261,9 +265,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
             }
         }
 
-
-
-        if(nEdges==0)
+        if (nEdges == 0)
         {
             optimizer.removeVertex(vPoint);
             vbNotIncludedMP[i]=true;
@@ -280,8 +282,8 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
     optimizer.optimize(nIterations);
     Verbose::PrintMess("BA: End of the optimization", Verbose::VERBOSITY_NORMAL);
 
-    // Recover optimized data
-    //Keyframes
+    // Recover optimized data 恢复优化后的数据
+    // Keyframes
     for(size_t i=0; i<vpKFs.size(); i++)
     {
         KeyFrame* pKF = vpKFs[i];
@@ -364,7 +366,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
         }
     }
 
-    //Points
+    // Points
     for(size_t i=0; i<vpMP.size(); i++)
     {
         if(vbNotIncludedMP[i])

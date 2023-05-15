@@ -225,12 +225,15 @@ public:
     // Vector of keypoints (original for visualization) and undistorted (actually used by the system).
     // In the stereo case, mvKeysUn is redundant as images must be rectified.
     // In the RGB-D case, RGB images can be distorted.
+    // 
     std::vector<cv::KeyPoint> mvKeys, mvKeysRight;
     std::vector<cv::KeyPoint> mvKeysUn;
 
     // Corresponding stereo coordinate and depth for each keypoint.
+    // 每个关键点对应的立体坐标和深度。
     std::vector<MapPoint*> mvpMapPoints;
     // "Monocular" keypoints have a negative value.
+    // “单目”关键点有一个负值
     std::vector<float> mvuRight;
     std::vector<float> mvDepth;
 

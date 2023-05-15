@@ -96,3 +96,6 @@ cmake-build-debug/
 *.pyc
 *.osa
 .vscode/settings.json
+
+# Object related
+weights

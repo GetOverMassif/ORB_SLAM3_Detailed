@@ -148,7 +148,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
     const float thHuber3D = sqrt(7.815);
 
     // Set MapPoint vertices 设置地图点顶点
-    for(size_t i=0; i<vpMP.size(); i++)
+    for(size_t i = 0; i < vpMP.size(); i++)
     {
         MapPoint* pMP = vpMP[i];
         if(pMP->isBad())
@@ -161,13 +161,14 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
         vPoint->setMarginalized(true);
         optimizer.addVertex(vPoint);
         
-        // 获取观测
+        // 获取观测到该点的关键帧及点在帧中的索引
         const map<KeyFrame*,tuple<int,int>> observations = pMP->GetObservations();
 
         int nEdges = 0;
-        //SET EDGES
-        for(map<KeyFrame*,tuple<int,int>>::const_iterator mit=observations.begin(); mit!=observations.end(); mit++)
+        // 遍历这些关键帧以建立边
+        for(map<KeyFrame*,tuple<int,int>>::const_iterator mit = observations.begin(); mit != observations.end(); mit++)
         {
+            // 如果关键帧已坏/超出最大ID/关联的关键帧或地图点顶点在优化器中为空，则continue
             KeyFrame* pKF = mit->first;
             if(pKF->isBad() || pKF->mnId > maxKFid)
                 continue;
@@ -177,7 +178,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
 
             const int leftIndex = get<0>(mit->second);
 
-            if(leftIndex != -1 && pKF->mvuRight[get<0>(mit->second)]<0)
+            if(leftIndex != -1 && pKF->mvuRight[get<0>(mit->second)] < 0)
             {
                 const cv::KeyPoint &kpUn = pKF->mvKeysUn[leftIndex];
 
@@ -279,14 +280,15 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
             }
         }
 
+        // 如果边数为零，则移除该点的顶点；设置是否不包含该地图点
         if (nEdges == 0)
         {
             optimizer.removeVertex(vPoint);
-            vbNotIncludedMP[i]=true;
+            vbNotIncludedMP[i] = true;
         }
         else
         {
-            vbNotIncludedMP[i]=false;
+            vbNotIncludedMP[i] = false;
         }
     }
 

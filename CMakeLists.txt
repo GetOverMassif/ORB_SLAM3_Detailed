@@ -53,6 +53,8 @@ include_directories(
     ${Pangolin_INCLUDE_DIRS}
 )
 
+add_subdirectory(pybind11)
+
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 add_library(
@@ -121,6 +123,7 @@ add_subdirectory(Thirdparty/g2o)
 
 target_link_libraries(
     ${PROJECT_NAME}
+    pybind11::embed
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Pangolin_LIBRARIES}
@@ -194,26 +197,26 @@ endif()
 #Monocular examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/Monocular)
 
-add_executable(mono_tum
-        Examples/Monocular/mono_tum.cc)
-target_link_libraries(mono_tum ${PROJECT_NAME})
+# add_executable(mono_tum
+#         Examples/Monocular/mono_tum.cc)
+# target_link_libraries(mono_tum ${PROJECT_NAME})
 
-add_executable(mono_kitti
-        Examples/Monocular/mono_kitti.cc)
-target_link_libraries(mono_kitti ${PROJECT_NAME})
+# add_executable(mono_kitti
+#         Examples/Monocular/mono_kitti.cc)
+# target_link_libraries(mono_kitti ${PROJECT_NAME})
 
-add_executable(mono_euroc
-        Examples/Monocular/mono_euroc.cc)
-target_link_libraries(mono_euroc ${PROJECT_NAME})
+# add_executable(mono_euroc
+#         Examples/Monocular/mono_euroc.cc)
+# target_link_libraries(mono_euroc ${PROJECT_NAME})
 
-add_executable(mono_tum_vi
-        Examples/Monocular/mono_tum_vi.cc)
-target_link_libraries(mono_tum_vi ${PROJECT_NAME})
+# add_executable(mono_tum_vi
+#         Examples/Monocular/mono_tum_vi.cc)
+# target_link_libraries(mono_tum_vi ${PROJECT_NAME})
 
 if(realsense2_FOUND)
-    add_executable(mono_realsense_t265
-            Examples/Monocular/mono_realsense_t265.cc)
-    target_link_libraries(mono_realsense_t265 ${PROJECT_NAME})
+    # add_executable(mono_realsense_t265
+    #         Examples/Monocular/mono_realsense_t265.cc)
+    # target_link_libraries(mono_realsense_t265 ${PROJECT_NAME})
 
     add_executable(mono_realsense_D435i
             Examples/Monocular/mono_realsense_D435i.cc)
@@ -232,9 +235,9 @@ add_executable(mono_inertial_tum_vi
 target_link_libraries(mono_inertial_tum_vi ${PROJECT_NAME})
 
 if(realsense2_FOUND)
-    add_executable(mono_inertial_realsense_t265
-            Examples/Monocular-Inertial/mono_inertial_realsense_t265.cc)
-    target_link_libraries(mono_inertial_realsense_t265 ${PROJECT_NAME})
+    # add_executable(mono_inertial_realsense_t265
+    #         Examples/Monocular-Inertial/mono_inertial_realsense_t265.cc)
+    # target_link_libraries(mono_inertial_realsense_t265 ${PROJECT_NAME})
 
     add_executable(mono_inertial_realsense_D435i
             Examples/Monocular-Inertial/mono_inertial_realsense_D435i.cc)
@@ -268,9 +271,9 @@ if(realsense2_FOUND)
             Examples/Calibration/recorder_realsense_D435i.cc)
     target_link_libraries(recorder_realsense_D435i ${PROJECT_NAME})
 
-    add_executable(recorder_realsense_T265
-            Examples/Calibration/recorder_realsense_T265.cc)
-    target_link_libraries(recorder_realsense_T265 ${PROJECT_NAME})
+    # add_executable(recorder_realsense_T265
+    #         Examples/Calibration/recorder_realsense_T265.cc)
+    # target_link_libraries(recorder_realsense_T265 ${PROJECT_NAME})
 endif()
 
 # #Old examples

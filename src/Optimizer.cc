@@ -83,11 +83,21 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
     if(pbStopFlag)
         optimizer.setForceStopFlag(pbStopFlag);
 
-
+    // 最大关键帧id、nExpectedSize(关键帧数量*地图点数量)
     long unsigned int maxKFid = 0;
-
     const int nExpectedSize = (vpKFs.size())*vpMP.size();
 
+    /**
+     * vpEdgesMono:
+     * vpEdgesBody:
+     * vpEdgeKFMono:
+     * vpEdgeKFBody:
+     * vpMapPointEdgeMono:
+     * vpMapPointEdgeBody:
+     * vpEdgesStereo:
+     * vpEdgeKFStereo:
+     * vpMapPointEdgeStereo:
+    */
     vector<ORB_SLAM3::EdgeSE3ProjectXYZ*> vpEdgesMono;
     vpEdgesMono.reserve(nExpectedSize);
 
@@ -117,17 +127,19 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
 
     
     // Set KeyFrame vertices 设置关键帧顶点
-    for(size_t i=0; i<vpKFs.size(); i++)
+    for(size_t i = 0; i < vpKFs.size(); i++)
     {
         KeyFrame* pKF = vpKFs[i];
         if(pKF->isBad())
             continue;
+        // 创建g2o的SE3类型顶点，设置估计量、ID、是否固定，将顶点加入优化器
         g2o::VertexSE3Expmap * vSE3 = new g2o::VertexSE3Expmap();
         Sophus::SE3<float> Tcw = pKF->GetPose();
         vSE3->setEstimate(g2o::SE3Quat(Tcw.unit_quaternion().cast<double>(),Tcw.translation().cast<double>()));
         vSE3->setId(pKF->mnId);
         vSE3->setFixed(pKF->mnId==pMap->GetInitKFid());
         optimizer.addVertex(vSE3);
+        // 更新最大关键帧ID
         if(pKF->mnId > maxKFid)
             maxKFid = pKF->mnId;
     }
@@ -141,14 +153,16 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
         MapPoint* pMP = vpMP[i];
         if(pMP->isBad())
             continue;
+        // 创建g2o的pointXYZ类型顶点，设置估计量、ID、是否参与边缘化，将顶点加入优化器
         g2o::VertexSBAPointXYZ* vPoint = new g2o::VertexSBAPointXYZ();
         vPoint->setEstimate(pMP->GetWorldPos().cast<double>());
         const int id = pMP->mnId + maxKFid + 1;
         vPoint->setId(id);
         vPoint->setMarginalized(true);
         optimizer.addVertex(vPoint);
-
-       const map<KeyFrame*,tuple<int,int>> observations = pMP->GetObservations();
+        
+        // 获取观测
+        const map<KeyFrame*,tuple<int,int>> observations = pMP->GetObservations();
 
         int nEdges = 0;
         //SET EDGES
@@ -284,7 +298,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
 
     // Recover optimized data 恢复优化后的数据
     // Keyframes
-    for(size_t i=0; i<vpKFs.size(); i++)
+    for(size_t i = 0; i < vpKFs.size(); i++)
     {
         KeyFrame* pKF = vpKFs[i];
         if(pKF->isBad())
@@ -367,7 +381,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
     }
 
     // Points
-    for(size_t i=0; i<vpMP.size(); i++)
+    for(size_t i = 0; i < vpMP.size(); i++)
     {
         if(vbNotIncludedMP[i])
             continue;

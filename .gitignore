@@ -99,3 +99,4 @@ cmake-build-debug/
 
 # Object related
 weights
+reconstruct/__pycache__/

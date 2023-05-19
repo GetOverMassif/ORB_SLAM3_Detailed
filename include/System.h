@@ -40,10 +40,10 @@
 #include "ImuTypes.h"
 #include "Settings.h"
 
-#include <pybind11/embed.h>
-#include <pybind11/eigen.h>
+// #include <pybind11/embed.h>
+// #include <pybind11/eigen.h>
 
-namespace py = pybind11;
+// namespace py = pybind11;
 
 namespace ORB_SLAM3
 {
@@ -195,6 +195,11 @@ public:
     void InsertResizeTime(double& time);
     void InsertTrackTime(double& time);
 #endif
+
+    // object related
+    // py::object pyCfg;
+    // py::object pyDecoder;
+    // py::object pySequence;
 
 private:
 

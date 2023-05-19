@@ -53,7 +53,7 @@ include_directories(
     ${Pangolin_INCLUDE_DIRS}
 )
 
-add_subdirectory(pybind11)
+# add_subdirectory(pybind11)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
@@ -123,7 +123,7 @@ add_subdirectory(Thirdparty/g2o)
 
 target_link_libraries(
     ${PROJECT_NAME}
-    pybind11::embed
+    # pybind11::embed
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Pangolin_LIBRARIES}

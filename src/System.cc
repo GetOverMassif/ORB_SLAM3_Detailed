@@ -145,16 +145,16 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         cout << "Vocabulary loaded!" << endl << endl;
 
         // 设置物体相关的变量
-        py::initialize_interpreter();
-        cv::FileStorage fSettings(strSettingsFile, cv::FileStorage::READ);
-        py::module sys = py::module::import("sys");
-        sys.attr("path").attr("append")("./");
-        py::module io_utils = py::module::import("reconstruct.utils");
-        string pyCfgPath = fSettings["DetectorConfigPath"].string();
-        pyCfg = io_utils.attr("get_configs")(pyCfgPath);
-        pyDecoder = io_utils.attr("get_decoder")(pyCfg);
-        pySequence = py::module::import("reconstruct").attr("get_sequence")(strSequencePath, pyCfg);
-        InitThread();
+        // py::initialize_interpreter();
+        // cv::FileStorage fSettings(strSettingsFile, cv::FileStorage::READ);
+        // py::module sys = py::module::import("sys");
+        // sys.attr("path").attr("append")("./");
+        // py::module io_utils = py::module::import("reconstruct.utils");
+        // string pyCfgPath = fSettings["DetectorConfigPath"].string();
+        // pyCfg = io_utils.attr("get_configs")(pyCfgPath);
+        // pyDecoder = io_utils.attr("get_decoder")(pyCfg);
+        // pySequence = py::module::import("reconstruct").attr("get_sequence")(strSequencePath, pyCfg);
+        // InitThread();
 
         //Create KeyFrame Database
         // Step 4 创建关键帧数据库
